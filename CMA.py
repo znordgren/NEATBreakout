@@ -46,13 +46,7 @@ def cmaes(N, mu, lam):
     # while counteval < stopeval:
 
     
-
-
-
-
-
-
-
+    
 
 N = 20
 lam = 4+np.floor(3*np.log(N))
