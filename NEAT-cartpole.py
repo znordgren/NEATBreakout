@@ -2,12 +2,6 @@ from __future__ import print_function
 import os
 import neat
 import gym
-import tensorflow as tf
-
-# 2-input XOR inputs and expected outputs.
-xor_inputs = [(0.0, 0.0), (0.0, 1.0), (1.0, 0.0), (1.0, 1.0)]
-xor_outputs = [   (0.0,),     (1.0,),     (1.0,),     (0.0,)]
-
 
 def eval_genomes(genomes, config):
     env = gym.make('CartPole-v0')
