@@ -3,28 +3,40 @@ import os
 import neat
 import gym
 import numpy as np
-
+import pandas as pd
 
 def eval_genomes(genomes, config):
     env = gym.make('Breakout-ram-v0')
-    timeoutVal = 150
+    timeoutVal = 50
+    observationArray = []
     for genome_id, genome in genomes:
 
         countNoScore = timeoutVal
         genome.fitness = 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
+        fitness = 0
+
+        for iRun in range(0,2):
+            
+            observation = env.reset()
+            observation, reward, done, info = env.step(1)
+            while True:
+                # latentObservations = reduceObservations(observation) # call autoencoder
+                action = net.activate(observation/255)
+                observation, reward, done, info = env.step(np.argmax(action))
+                observationArray.append(observation)
+                fitness += reward
+                if reward == 0:
+                    countNoScore -= 1
+                else:
+                    countNoScore = timeoutVal
+                if done or countNoScore==0:
+                    break
         
-        observation = env.reset()
-        while True:
-            action = net.activate(observation/255)
-            observation, reward, done, info = env.step(np.argmax(action))
-            genome.fitness += reward
-            if reward == 0:
-                countNoScore -= 1
-            else:
-                countNoScore = timeoutVal
-            if done or countNoScore==0:
-                break
+        genome.fitness = fitness
+
+    df = pd.DataFrame(observationArray)
+    df.to_csv('observations.csv')
 
     env.close()
 
@@ -42,7 +54,7 @@ def run(config_file):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     p.add_reporter(neat.Checkpointer(generation_interval=5,time_interval_seconds=10000))
-    
+
     print('Starting Training')
     winner = p.run(eval_genomes, 1000)
 
