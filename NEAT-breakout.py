@@ -19,28 +19,27 @@ import pandas as pd
 def eval_genomes(genomes, config):
     #ae = tf.keras.models.load_model('ae.h5')
     env = gym.make('Breakout-ram-v0')
-    timeoutVal = 100
+    timeoutVal = 150
     observationArray = []
+    observationIndex = [18,30,49,52,70,71,72,74,75,86,90,91,94,95,96,99,100,101,102,103,104,105,106,107,119,121,122]
     for genome_id, genome in genomes:
-        print('.',end='')
         genome.fitness = 0
-
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        fitness = 0
+        fitness = [0,0,0]
 
-        for iRun in range(0,3):
+        for iRun in range(0,len(fitness)):
             countNoScore = timeoutVal
             observation = env.reset()
-            observation, reward, done, info = env.step(1)
+            #observation, reward, done, info = env.step(1)
             while True:
                 #latentObservations = ae.predict(np.array([observation])) # call autoencoder
                 #print(latentObservations[0])
                 #action = net.activate(latentObservations[0]/255)
 
-                action = net.activate(observation)
+                action = net.activate(observation[observationIndex]/255)
                 observation, reward, done, info = env.step(np.argmax(action))
                 #observationArray.append(observation)
-                fitness += reward
+                fitness[iRun] += reward
                 if reward == 0:
                     countNoScore -= 1
                 else:
@@ -48,7 +47,7 @@ def eval_genomes(genomes, config):
                 if done or countNoScore==0:
                     break
         
-        genome.fitness = fitness
+        genome.fitness = np.mean(fitness)
 
     #df = pd.read_csv('observations.csv',index_col=0)
     #df = df.sample(frac=0.5,)

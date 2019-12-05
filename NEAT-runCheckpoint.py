@@ -12,7 +12,7 @@ def run(config_file):
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_file)
-    p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-497')
+    p = neat.Checkpointer.restore_checkpoint('neat-checkpoint-247')
 
     pop = p.population
     net = []
@@ -22,7 +22,7 @@ def run(config_file):
 
     env = gym.make('Breakout-ram-v0')
     timeoutVal = 200
-
+    observationIndex = [18,30,49,52,70,71,72,74,75,86,90,91,94,95,96,99,100,101,102,103,104,105,106,107,119,121,122]
     
     while True:
         fitness = 0
@@ -34,7 +34,7 @@ def run(config_file):
             action = [0,0,0,0]
 
             for n in net:
-                a = n.activate(observation/255)
+                a = n.activate(observation[observationIndex])
                 action[np.argmax(a)] += 1
             #print(action)
             observation, reward, done, info = env.step(np.argmax(action))
